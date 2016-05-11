@@ -1,6 +1,7 @@
 ﻿namespace LolSharp
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using RiotDtos.ChampionMastery;
     using RiotDtos.CurrentGame;
     using RiotDtos.Game;
@@ -12,25 +13,25 @@
 
     public interface IRiotClient
     {
-        SummonerDto GetSummoner(long summonerId);
-        SummonerDto GetSummonerByName(string summonerName);
-        Dictionary<string, SummonerDto> GetSummoners(IEnumerable<long> summonerIds);
-        Dictionary<string, SummonerDto> GetSummonersByName(IEnumerable<string> summonerNames);
-        MatchList GetMatchList(long summonerId);
-        MatchDetail GetMatch(long matchId);
-        RankedStatsDto GetRankedStats(long summonerId);
-        PlayerStatsSummaryListDto GetSummaryStats(long summonerId);
-        RecentGamesDto GetRecentGames(long summonerId);
-        ChampionMasteryDto GetChampionMasteryForChampion(long summonerId, long championId);
-        List<ChampionMasteryDto> GetChampionMasteries(long summonerId);
-        int GetChampionMasteryTotalScore(long summonerId);
-        List<ChampionMasteryDto> GetChampionMasteryTopChampions(long summonerId);
-        CurrentGameInfo GetCurrentGame(long summonerId);
-        RiotDtos.StaticData.ChampionListDto GetChampionsStaticData();
-        RiotDtos.StaticData.ChampionDto GetChampionStaticData(int championId);
-        RiotDtos.Champion.ChampionListDto GetChampionsData();
-        RiotDtos.Champion.ChampionDto GetChampionData(long championId);
-        List<LeagueDto> GetLeaguesForSummoner(long summonerId);
-        Dictionary<string, List<LeagueDto>> GetLeaguesForSummoners(IEnumerable<long> summonerIds);
+        Task<SummonerDto> GetSummoner(long summonerId);
+        Task<SummonerDto> GetSummonerByName(string summonerName);
+        Task<Dictionary<string, SummonerDto>> GetSummoners(IEnumerable<long> summonerIds);
+        Task<Dictionary<string, SummonerDto>> GetSummonersByName(IEnumerable<string> summonerNames);
+        Task<MatchList> GetMatchList(long summonerId);
+        Task<MatchDetail> GetMatch(long matchId);
+        Task<RankedStatsDto> GetRankedStats(long summonerId);
+        Task<PlayerStatsSummaryListDto> GetSummaryStats(long summonerId);
+        Task<RecentGamesDto> GetRecentGames(long summonerId);
+        Task<ChampionMasteryDto> GetChampionMasteryForChampion(long summonerId, long championId);
+        Task<List<ChampionMasteryDto>> GetChampionMasteries(long summonerId);
+        Task<int> GetChampionMasteryTotalScore(long summonerId);
+        Task<List<ChampionMasteryDto>> GetChampionMasteryTopChampions(long summonerId);
+        Task<CurrentGameInfo> GetCurrentGame(long summonerId);
+        Task<RiotDtos.StaticData.ChampionListDto> GetChampionsStaticData();
+        Task<RiotDtos.StaticData.ChampionDto> GetChampionStaticData(int championId);
+        Task<RiotDtos.Champion.ChampionListDto> GetChampionsData();
+        Task<RiotDtos.Champion.ChampionDto> GetChampionData(long championId);
+        Task<List<LeagueDto>> GetLeaguesForSummoner(long summonerId);
+        Task<Dictionary<string, List<LeagueDto>>> GetLeaguesForSummoners(IEnumerable<long> summonerIds);
     }
 }
