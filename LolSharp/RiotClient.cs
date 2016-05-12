@@ -48,9 +48,10 @@
         public async Task<SummonerDto> GetSummonerByName(string summonerName)
         {
             var summoner = await GetSummonersByName(new List<string> { summonerName });
+            var caseInsensitveSummoner = new Dictionary<string, SummonerDto>(summoner, StringComparer.OrdinalIgnoreCase);
 
             SummonerDto summonerDto;
-            return summoner.TryGetValue(summonerName, out summonerDto) ? summonerDto : null;
+            return caseInsensitveSummoner.TryGetValue(summonerName, out summonerDto) ? summonerDto : null;
         }
 
         public async Task<Dictionary<string, SummonerDto>> GetSummoners(IEnumerable<long> summonerIds)
@@ -76,7 +77,7 @@
             {
                 throw new ArgumentException("Can only pass in up to 40 summoners to retrieve", nameof(summonerNames));
             }
-            var request = new RestRequest { Resource = "api/lol/{region}/v1.4/summoner/{summonerNames}" };
+            var request = new RestRequest { Resource = "api/lol/{region}/v1.4/summoner/by-name/{summonerNames}" };
 
             request.AddParameter("summonerNames", string.Join(",", summonerNames), ParameterType.UrlSegment);
 
