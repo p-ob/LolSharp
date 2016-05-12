@@ -243,7 +243,7 @@
                     var retryAfterValue = retryAfterHeader?.Value as int?;
                     if (retryAfterValue != null)
                     {
-                        throw new TooManyRequestsException(retryAfterValue ?? 0,
+                        throw new TooManyRequestsException(retryAfterValue.Value,
                             "Riot responded with an HTTP status code of 429. Check RetryAfter to see minimum wait time.",
                             response.ErrorException);
                     }
