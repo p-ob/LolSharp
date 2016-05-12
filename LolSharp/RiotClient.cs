@@ -48,10 +48,9 @@
         public async Task<SummonerDto> GetSummonerByName(string summonerName)
         {
             var summoner = await GetSummonersByName(new List<string> { summonerName });
-            var caseInsensitveSummoner = new Dictionary<string, SummonerDto>(summoner, StringComparer.OrdinalIgnoreCase);
 
             SummonerDto summonerDto;
-            return caseInsensitveSummoner.TryGetValue(summonerName, out summonerDto) ? summonerDto : null;
+            return summoner.TryGetValue(summonerName, out summonerDto) ? summonerDto : null;
         }
 
         public async Task<Dictionary<string, SummonerDto>> GetSummoners(IEnumerable<long> summonerIds)
@@ -81,7 +80,9 @@
 
             request.AddParameter("summonerNames", string.Join(",", summonerNames), ParameterType.UrlSegment);
 
-            return await Execute<Dictionary<string, SummonerDto>>(request);
+            var resp = await Execute<Dictionary<string, SummonerDto>>(request);
+
+            return new Dictionary<string, SummonerDto>(resp, StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task<MatchList> GetMatchList(long summonerId)
