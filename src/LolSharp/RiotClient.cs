@@ -234,7 +234,7 @@
             request.AddParameter("region", regionString, ParameterType.UrlSegment);
             var response = await client.ExecuteTaskAsync<T>(request);
 
-            if (response.ErrorException != null)
+            if (response.ErrorException != null || response.StatusCode != HttpStatusCode.OK)
             {
                 // TooManyRequests
                 if (response.StatusCode == (HttpStatusCode)429)
@@ -250,7 +250,7 @@
 
                     throw new TooManyRequestsException();
                 }
-                const string message = "Error retrieving response. Check inner details for more info.";
+                var message = $"Error retrieving response. Riot returned an HTTP Status of {response.StatusCode}. Check inner details for more info.";
                 var riotException = new Exception(message, response.ErrorException);
                 throw riotException;
             }
