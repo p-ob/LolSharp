@@ -240,11 +240,15 @@
                 if (response.StatusCode == (HttpStatusCode)429)
                 {
                     var retryAfterHeader = response.Headers.FirstOrDefault(h => h.Name == "Retry-After");
-                    if (retryAfterHeader != null)
+                    var retryAfterValue = retryAfterHeader?.Value as int?;
+                    if (retryAfterValue != null)
                     {
-                        var retryAfterValue = retryAfterHeader.Value as int?;
-                        throw new TooManyRequestsException(retryAfterValue ?? 0, "Riot responded with an HTTP status code of 429. Check RetryAfter to see minimum wait time.", response.ErrorException);
+                        throw new TooManyRequestsException(retryAfterValue ?? 0,
+                            "Riot responded with an HTTP status code of 429. Check RetryAfter to see minimum wait time.",
+                            response.ErrorException);
                     }
+
+                    throw new TooManyRequestsException();
                 }
                 const string message = "Error retrieving response. Check inner details for more info.";
                 var riotException = new Exception(message, response.ErrorException);
@@ -320,9 +324,8 @@
     {
         public int RetryAfter { get; set; }
 
-        public TooManyRequestsException() : base()
+        public TooManyRequestsException() : this(-1, "No retry after value given.")
         {
-
         }
 
         public TooManyRequestsException(int retryAfter)
