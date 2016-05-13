@@ -2,14 +2,15 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using RiotDtos.ChampionMastery;
-    using RiotDtos.CurrentGame;
-    using RiotDtos.Game;
-    using RiotDtos.Match;
-    using RiotDtos.MatchList;
-    using RiotDtos.Stats;
-    using RiotDtos.Summoner;
-    using RiotDtos.League;
+    using RiotObjects.ChampionMastery;
+    using RiotObjects.CurrentGame;
+    using RiotObjects.Game;
+    using RiotObjects.League;
+    using RiotObjects.Match;
+    using RiotObjects.MatchList;
+    using RiotObjects.StaticData;
+    using RiotObjects.Stats;
+    using RiotObjects.Summoner;
 
     public interface IRiotClient
     {
@@ -41,13 +42,13 @@
 
         Task<CurrentGameInfo> GetCurrentGame(long summonerId);
 
-        Task<RiotDtos.StaticData.ChampionListDto> GetChampionsStaticData();
+        Task<ChampionListDto> GetChampionsStaticData();
 
-        Task<RiotDtos.StaticData.ChampionDto> GetChampionStaticData(int championId);
+        Task<ChampionDto> GetChampionStaticData(int championId);
 
-        Task<RiotDtos.Champion.ChampionListDto> GetChampionsData();
+        Task<RiotObjects.Champion.ChampionListDto> GetChampionsData();
 
-        Task<RiotDtos.Champion.ChampionDto> GetChampionData(long championId);
+        Task<RiotObjects.Champion.ChampionDto> GetChampionData(long championId);
 
         Task<List<LeagueDto>> GetLeaguesForSummoner(long summonerId);
 

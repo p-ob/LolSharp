@@ -2,19 +2,20 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
-    using RiotDtos.League;
     using RestSharp;
-    using RiotDtos.ChampionMastery;
-    using RiotDtos.CurrentGame;
-    using RiotDtos.Game;
-    using RiotDtos.Match;
-    using RiotDtos.MatchList;
-    using RiotDtos.StaticData;
-    using RiotDtos.Stats;
-    using RiotDtos.Summoner;
+    using RiotObjects.ChampionMastery;
+    using RiotObjects.CurrentGame;
+    using RiotObjects.Game;
+    using RiotObjects.League;
+    using RiotObjects.Match;
+    using RiotObjects.MatchList;
+    using RiotObjects.StaticData;
+    using RiotObjects.Stats;
+    using RiotObjects.Summoner;
 
     public class RiotClient : IRiotClient
     {
@@ -29,10 +30,9 @@
         public RiotClient(string apiKey, RiotRegion region)
         {
             if (string.IsNullOrWhiteSpace(apiKey)) throw new ArgumentException("apiKey is required", nameof(apiKey));
-            if (!Enum.IsDefined(typeof(RiotRegion), region))
-            {
-                throw new ArgumentException("Region is not valid.", nameof(region));
-            }
+            if (!Enum.IsDefined(typeof(RiotRegion), region)) throw new ArgumentException("Region is not valid.", nameof(region));
+
+            CheckApiKey();
 
             _apiKey = apiKey;
             Region = region;
@@ -186,19 +186,19 @@
             return Execute<ChampionDto>(request);
         }
 
-        public async Task<RiotDtos.Champion.ChampionListDto> GetChampionsData()
+        public async Task<RiotObjects.Champion.ChampionListDto> GetChampionsData()
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v1.2/champion" };
 
-            return await Execute<RiotDtos.Champion.ChampionListDto>(request);
+            return await Execute<RiotObjects.Champion.ChampionListDto>(request);
         }
 
-        public async Task<RiotDtos.Champion.ChampionDto> GetChampionData(long championId)
+        public async Task<RiotObjects.Champion.ChampionDto> GetChampionData(long championId)
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v1.2/champion/{id}" };
             request.AddParameter("id", championId, ParameterType.UrlSegment);
 
-            return await Execute<RiotDtos.Champion.ChampionDto>(request);
+            return await Execute<RiotObjects.Champion.ChampionDto>(request);
         }
 
         public async Task<List<LeagueDto>> GetLeaguesForSummoner(long summonerId)
@@ -251,10 +251,23 @@
                     throw new TooManyRequestsException();
                 }
                 var message = $"Error retrieving response. Riot returned an HTTP Status of {response.StatusCode}. Check inner details for more info.";
-                var riotException = new Exception(message, response.ErrorException);
+                var riotException = new RiotApiException(response.StatusCode, message, response.ErrorException);
                 throw riotException;
             }
             return response.Data;
+        }
+
+        // runs an api call that doesn't count against the rate limit and checks for an HTTP Status of 401
+        private void CheckApiKey()
+        {
+            try
+            {
+                GetChampionStaticData(1);
+            }
+            catch (RiotApiException e) when (e.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new RiotClientException("Api key is not valid. Get a valid api key from https://developer.riotgames.com/");
+            }
         }
 
         private RiotPlatform MapRegionToPlatform()
@@ -320,7 +333,7 @@
     }
 
     [Serializable]
-    public class TooManyRequestsException : Exception
+    public class TooManyRequestsException : RiotApiException
     {
         public int RetryAfter { get; set; }
 
@@ -328,20 +341,53 @@
         {
         }
 
-        public TooManyRequestsException(int retryAfter)
+        public TooManyRequestsException(int retryAfter) : base((HttpStatusCode)429, string.Empty)
         {
             RetryAfter = retryAfter;
         }
 
-        public TooManyRequestsException(int retryAfter, string message) : base(message)
+        public TooManyRequestsException(int retryAfter, string message) : base((HttpStatusCode)429, message)
         {
             RetryAfter = retryAfter;
         }
 
         public TooManyRequestsException(int retryAfter, string message, Exception innerException)
-            : base(message, innerException)
+            : base((HttpStatusCode)429, message, innerException)
         {
             RetryAfter = retryAfter;
+        }
+    }
+
+    [Serializable]
+    public class RiotApiException : Exception
+    {
+        public HttpStatusCode StatusCode { get; set; }
+
+        public RiotApiException(HttpStatusCode statusCode) : this(statusCode, string.Empty, null)
+        {
+        }
+
+        public RiotApiException(HttpStatusCode statusCode, string message) : this(statusCode, message, null)
+        {
+        }
+
+        public RiotApiException(HttpStatusCode statusCode, string message, Exception innerException)
+            : base(message, innerException)
+        {
+            StatusCode = statusCode;
+        }
+    }
+
+    public class RiotClientException : Exception
+    {
+        public RiotClientException(string message) : this(message, null)
+        {
+            
+        }
+
+        public RiotClientException(string message, Exception innerException) : base(message, innerException)
+        {
+            
         }
     }
 }
