@@ -2,13 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
     using RestSharp;
     using RiotObjects.ChampionMastery;
     using RiotObjects.CurrentGame;
+    using RiotObjects.FeaturedGame;
     using RiotObjects.Game;
     using RiotObjects.League;
     using RiotObjects.Match;
@@ -103,11 +103,11 @@
             return await Execute<MatchList>(request);
         }
 
-        public async Task<MatchDetail> GetMatch(long matchId, bool includeTimeline = false)
+        public async Task<MatchDetail> GetMatch(long matchId, bool? includeTimeline = null)
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v2.2/match/{matchId}" };
             request.AddParameter("matchId", matchId, ParameterType.UrlSegment);
-            request.AddParameter("includeTimeline", includeTimeline, ParameterType.QueryString);
+            if (includeTimeline != null) request.AddParameter("includeTimeline", includeTimeline, ParameterType.QueryString);
 
             return await Execute<MatchDetail>(request);
         }
@@ -166,12 +166,12 @@
             return await Execute<int>(request);
         }
 
-        public async Task<List<ChampionMasteryDto>> GetChampionMasteryTopChampions(long summonerId, int count = 3)
+        public async Task<List<ChampionMasteryDto>> GetChampionMasteryTopChampions(long summonerId, int? count = null)
         {
             var request = new RestRequest { Resource = "championmastery/location/{platformId}/player/{playerId}/topchampions" };
             request.AddParameter("playerId", summonerId, ParameterType.UrlSegment);
             request.AddParameter("platformId", MapRegionToPlatform().ToString().ToUpper(), ParameterType.UrlSegment);
-            request.AddParameter("count", count, ParameterType.QueryString);
+            if (count != null) request.AddParameter("count", count, ParameterType.QueryString);
 
             return await Execute<List<ChampionMasteryDto>>(request);
         }
@@ -210,10 +210,10 @@
             return Execute<ChampionDto>(request);
         }
 
-        public async Task<RiotObjects.Champion.ChampionListDto> GetChampionsData(bool freeToPlay = false)
+        public async Task<RiotObjects.Champion.ChampionListDto> GetChampionsData(bool? freeToPlay = null)
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v1.2/champion" };
-            request.AddParameter("freeToPlay", freeToPlay, ParameterType.QueryString);
+            if (freeToPlay != null) request.AddParameter("freeToPlay", freeToPlay, ParameterType.QueryString);
 
             return await Execute<RiotObjects.Champion.ChampionListDto>(request);
         }
@@ -244,6 +244,84 @@
 
             return await Execute<Dictionary<string, List<LeagueDto>>>(request);
 
+        }
+
+        public async Task<List<LeagueDto>> GetLeagueEntriesForSummoner(long summonerId)
+        {
+            var leagues = await GetLeagueEntriesForSummoners(new List<long> { summonerId });
+            List<LeagueDto> leagueDtos;
+
+            return leagues.TryGetValue(summonerId.ToString(), out leagueDtos) ? leagueDtos : null;
+        }
+
+        public async Task<Dictionary<string, List<LeagueDto>>> GetLeagueEntriesForSummoners(IEnumerable<long> summonerIds)
+        {
+            summonerIds = summonerIds.ToList();
+            if (summonerIds.Count() > 10) throw new ArgumentException("Can only pass in up to 10 summoners to retrieve", nameof(summonerIds));
+            var request = new RestRequest { Resource = "api/lol/{region}/v2.5/league/by-summoner/{summonerIds}/entry" };
+
+            request.AddParameter("summonerIds", string.Join(",", summonerIds), ParameterType.UrlSegment);
+
+            return await Execute<Dictionary<string, List<LeagueDto>>>(request);
+        }
+
+        public async Task<List<LeagueDto>> GetLeaguesForTeam(long teamId)
+        {
+            var leagues = await GetLeaguesForTeams(new List<long> { teamId });
+            List<LeagueDto> leagueDtos;
+
+            return leagues.TryGetValue(teamId.ToString(), out leagueDtos) ? leagueDtos : null;
+        }
+
+        public async Task<Dictionary<string, List<LeagueDto>>> GetLeaguesForTeams(IEnumerable<long> teamIds)
+        {
+            teamIds = teamIds.ToList();
+            if (teamIds.Count() > 10) throw new ArgumentException("Can only pass in up to 10 summoners to retrieve", nameof(teamIds));
+            var request = new RestRequest { Resource = "api/lol/{region}/v2.5/league/by-team/{teamIds}" };
+
+            request.AddParameter("teamIds", string.Join(",", teamIds), ParameterType.UrlSegment);
+
+            return await Execute<Dictionary<string, List<LeagueDto>>>(request);
+        }
+
+        public async Task<List<LeagueDto>> GetLeagueEntriesForTeam(long teamId)
+        {
+            var leagues = await GetLeagueEntriesForTeams(new List<long> { teamId });
+            List<LeagueDto> leagueDtos;
+
+            return leagues.TryGetValue(teamId.ToString(), out leagueDtos) ? leagueDtos : null;
+        }
+
+        public async Task<Dictionary<string, List<LeagueDto>>> GetLeagueEntriesForTeams(IEnumerable<long> teamIds)
+        {
+            teamIds = teamIds.ToList();
+            if (teamIds.Count() > 10) throw new ArgumentException("Can only pass in up to 10 summoners to retrieve", nameof(teamIds));
+            var request = new RestRequest { Resource = "api/lol/{region}/v2.5/league/by-team/{teamIds}/entry" };
+
+            request.AddParameter("teamIds", string.Join(",", teamIds), ParameterType.UrlSegment);
+
+            return await Execute<Dictionary<string, List<LeagueDto>>>(request);
+        }
+
+        public async Task<LeagueDto> GetChallengerLeague()
+        {
+            var request = new RestRequest { Resource = "api/lol/{region}/v2.5/league/challenger" };
+
+            return await Execute<LeagueDto>(request);
+        }
+
+        public async Task<LeagueDto> GetMastersLeague()
+        {
+            var request = new RestRequest { Resource = "api/lol/{region}/v2.5/league/master" };
+
+            return await Execute<LeagueDto>(request);
+        }
+
+        public async Task<FeaturedGames> GetFeaturedGames()
+        {
+            var request = new RestRequest { Resource = "/observer-mode/rest/featured" };
+
+            return await Execute<FeaturedGames>(request);
         }
 
         private async Task<T> Execute<T>(IRestRequest request) where T : new()

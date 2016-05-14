@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using RiotObjects.ChampionMastery;
     using RiotObjects.CurrentGame;
+    using RiotObjects.FeaturedGame;
     using RiotObjects.Game;
     using RiotObjects.League;
     using RiotObjects.Match;
@@ -62,7 +63,7 @@
         /// <param name="matchId"></param>
         /// <param name="includeTimeline"></param>
         /// <returns></returns>
-        Task<MatchDetail> GetMatch(long matchId, bool includeTimeline = false);
+        Task<MatchDetail> GetMatch(long matchId, bool? includeTimeline = null);
 
         /// <summary>
         /// /api/lol/{region}/v1.3/stats/by-summoner/{summonerId}/ranked
@@ -115,7 +116,7 @@
         /// <param name="summonerId"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        Task<List<ChampionMasteryDto>> GetChampionMasteryTopChampions(long summonerId, int count = 3);
+        Task<List<ChampionMasteryDto>> GetChampionMasteryTopChampions(long summonerId, int? count = null);
 
         /// <summary>
         /// /observer-mode/rest/consumer/getSpectatorGameInfo/{platformId}/{summonerId}
@@ -145,7 +146,7 @@
         /// /api/lol/{region}/v1.2/champion
         /// </summary>
         /// <returns></returns>
-        Task<RiotObjects.Champion.ChampionListDto> GetChampionsData(bool freeToPlay = false);
+        Task<RiotObjects.Champion.ChampionListDto> GetChampionsData(bool? freeToPlay = null);
 
         /// <summary>
         /// /api/lol/{region}/v1.2/champion/{id}
@@ -167,5 +168,65 @@
         /// <param name="summonerIds"></param>
         /// <returns></returns>
         Task<Dictionary<string, List<LeagueDto>>> GetLeaguesForSummoners(IEnumerable<long> summonerIds);
+
+        /// <summary>
+        /// /api/lol/{region}/v2.5/league/by-summoner/{summonerIds}/entry
+        /// </summary>
+        /// <param name="summonerId"></param>
+        /// <returns></returns>
+        Task<List<LeagueDto>> GetLeagueEntriesForSummoner(long summonerId);
+
+        /// <summary>
+        /// /api/lol/{region}/v2.5/league/by-summoner/{summonerIds}/entry
+        /// </summary>
+        /// <param name="summonerIds"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, List<LeagueDto>>> GetLeagueEntriesForSummoners(IEnumerable<long> summonerIds);
+
+        /// <summary>
+        /// /api/lol/{region}/v2.5/league/by-team/{teamIds}
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        Task<List<LeagueDto>> GetLeaguesForTeam(long teamId);
+
+        /// <summary>
+        /// /api/lol/{region}/v2.5/league/by-team/{teamIds}
+        /// </summary>
+        /// <param name="teamIds"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, List<LeagueDto>>> GetLeaguesForTeams(IEnumerable<long> teamIds);
+
+        /// <summary>
+        /// /api/lol/{region}/v2.5/league/by-team/{teamIds}/entry
+        /// </summary>
+        /// <param name="teamId"></param>
+        /// <returns></returns>
+        Task<List<LeagueDto>> GetLeagueEntriesForTeam(long teamId);
+
+        /// <summary>
+        /// /api/lol/{region}/v2.5/league/by-team/{teamIds}/entry
+        /// </summary>
+        /// <param name="teamIds"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, List<LeagueDto>>> GetLeagueEntriesForTeams(IEnumerable<long> teamIds);
+
+        /// <summary>
+        /// /api/lol/{region}/v2.5/league/challenger
+        /// </summary>
+        /// <returns></returns>
+        Task<LeagueDto> GetChallengerLeague();
+
+        /// <summary>
+        /// /api/lol/{region}/v2.5/league/master
+        /// </summary>
+        /// <returns></returns>
+        Task<LeagueDto> GetMastersLeague();
+
+        /// <summary>
+        /// /observer-mode/rest/featured
+        /// </summary>
+        /// <returns></returns>
+        Task<FeaturedGames> GetFeaturedGames();
     }
 }

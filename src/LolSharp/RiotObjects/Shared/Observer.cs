@@ -1,4 +1,4 @@
-﻿namespace LolSharp.RiotObjects.CurrentGame
+﻿namespace LolSharp.RiotObjects.Shared
 {
     public class Observer
     {
