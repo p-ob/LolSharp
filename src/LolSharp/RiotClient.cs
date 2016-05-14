@@ -56,10 +56,7 @@
         public async Task<Dictionary<string, SummonerDto>> GetSummoners(IEnumerable<long> summonerIds)
         {
             summonerIds = summonerIds.ToList();
-            if (summonerIds.Count() > 40)
-            {
-                throw new ArgumentException("Can only pass in up to 40 summoners to retrieve", nameof(summonerIds));
-            }
+            if (summonerIds.Count() > 40) throw new ArgumentException("Can only pass in up to 40 summoners to retrieve", nameof(summonerIds));
 
             var request = new RestRequest { Resource = "api/lol/{region}/v1.4/summoner/{summonerIds}" };
 
@@ -71,10 +68,7 @@
         public async Task<Dictionary<string, SummonerDto>> GetSummonersByName(IEnumerable<string> summonerNames)
         {
             summonerNames = summonerNames.ToList();
-            if (summonerNames.Count() > 40)
-            {
-                throw new ArgumentException("Can only pass in up to 40 summoners to retrieve", nameof(summonerNames));
-            }
+            if (summonerNames.Count() > 40) throw new ArgumentException("Can only pass in up to 40 summoners to retrieve", nameof(summonerNames));
             var request = new RestRequest { Resource = "api/lol/{region}/v1.4/summoner/by-name/{summonerNames}" };
 
             request.AddParameter("summonerNames", string.Join(",", summonerNames), ParameterType.UrlSegment);
@@ -234,17 +228,13 @@
         public async Task<Dictionary<string, List<LeagueDto>>> GetLeaguesForSummoners(IEnumerable<long> summonerIds)
         {
             summonerIds = summonerIds.ToList();
-            if (summonerIds.Count() > 10)
-            {
-                throw new ArgumentException("Can only pass in up to 10 summoners to retrieve", nameof(summonerIds));
-            }
+            if (summonerIds.Count() > 10) throw new ArgumentException("Can only pass in up to 10 summoners to retrieve", nameof(summonerIds));
             var request = new RestRequest { Resource = "api/lol/{region}/v2.5/league/by-summoner/{summonerIds}" };
 
             request.AddParameter("summonerIds", string.Join(",", summonerIds), ParameterType.UrlSegment);
 
-            var leagues = await Execute<Dictionary<string, List<LeagueDto>>>(request);
+            return await Execute<Dictionary<string, List<LeagueDto>>>(request);
 
-            return leagues;
         }
 
         private async Task<T> Execute<T>(IRestRequest request) where T : new()
@@ -397,6 +387,7 @@
         }
     }
 
+    [Serializable]
     public class RiotClientException : Exception
     {
         public RiotClientException(string message) : this(message, null)
