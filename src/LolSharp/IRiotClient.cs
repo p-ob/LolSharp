@@ -143,6 +143,112 @@
         Task<ChampionDto> GetChampionStaticData(int championId, string locale = null, string version = null, string dataById = null, string champData = null);
 
         /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/item
+        /// </summary>
+        /// <param name="locale"></param>
+        /// <param name="version"></param>
+        /// <param name="itemListData"></param>
+        /// <returns></returns>
+        Task<ItemListDto> GetItems(string locale = null, string version = null, string itemListData = null);
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/item/{id}
+        /// </summary>
+        /// <param name="itemId"></param>
+        /// <param name="locale"></param>
+        /// <param name="version"></param>
+        /// <param name="itemData"></param>
+        /// <returns></returns>
+        Task<ItemDto> GetItem(int itemId, string locale = null, string version = null, string itemData = null);
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/language-strings
+        /// </summary>
+        /// <returns></returns>
+        Task<LanguageStringsDto> GetLanguageStrings();
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/languages
+        /// </summary>
+        /// <returns></returns>
+        Task<List<string>> GetLanguages();
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/map
+        /// </summary>
+        /// <returns></returns>
+        Task<MapDataDto> GetMaps();
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/mastery
+        /// </summary>
+        /// <param name="locale"></param>
+        /// <param name="version"></param>
+        /// <param name="masteryListData"></param>
+        /// <returns></returns>
+        Task<MasteryListDto> GetMasteries(string locale = null, string version = null, string masteryListData = null);
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/mastery/{id}
+        /// </summary>
+        /// <param name="masterId"></param>
+        /// <param name="locale"></param>
+        /// <param name="version"></param>
+        /// <param name="masteryData"></param>
+        /// <returns></returns>
+        Task<MasteryDto> GetMastery(int masterId, string locale = null, string version = null, string masteryData = null);
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/realm
+        /// </summary>
+        /// <returns></returns>
+        Task<RealmDto> GetRealms();
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/rune
+        /// </summary>
+        /// <param name="locale"></param>
+        /// <param name="version"></param>
+        /// <param name="runeListData"></param>
+        /// <returns></returns>
+        Task<RuneListDto> GetRunes(string locale = null, string version = null, string runeListData = null);
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/rune/{id}
+        /// </summary>
+        /// <param name="runeId"></param>
+        /// <param name="locale"></param>
+        /// <param name="version"></param>
+        /// <param name="runeData"></param>
+        /// <returns></returns>
+        Task<RuneDto> GetRune(int runeId, string locale = null, string version = null, string runeData = null);
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/summoner-spell
+        /// </summary>
+        /// <param name="locale"></param>
+        /// <param name="version"></param>
+        /// <param name="spellData"></param>
+        /// <returns></returns>
+        Task<SummonerSpellListDto> GetSummonerSpells(string locale = null, string version = null, string spellData = null);
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/summoner-spell/{id}
+        /// </summary>
+        /// <param name="summonerSpellId"></param>
+        /// <param name="locale"></param>
+        /// <param name="version"></param>
+        /// <param name="spellData"></param>
+        /// <returns></returns>
+        Task<SummonerSpellDto> GetSummonerSpell(int summonerSpellId, string locale = null, string version = null, string spellData = null);
+
+        /// <summary>
+        /// /api/lol/static-data/{region}/v1.2/versions
+        /// </summary>
+        /// <returns></returns>
+        Task<List<string>> GetVersions();
+
+        /// <summary>
         /// /api/lol/{region}/v1.2/champion
         /// </summary>
         /// <returns></returns>
@@ -221,7 +327,7 @@
         /// /api/lol/{region}/v2.5/league/master
         /// </summary>
         /// <returns></returns>
-        Task<LeagueDto> GetMastersLeague();
+        Task<LeagueDto> GetMasterLeague();
 
         /// <summary>
         /// /observer-mode/rest/featured

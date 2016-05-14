@@ -39,7 +39,7 @@
 
         public RiotClient(string apiKey, RiotRegion region)
         {
-            if (string.IsNullOrWhiteSpace(apiKey)) throw new ArgumentException("apiKey is required", nameof(apiKey));
+            if (string.IsNullOrEmpty(apiKey)) throw new ArgumentException("apiKey is required", nameof(apiKey));
 
             _apiKey = apiKey;
             Region = region;
@@ -116,7 +116,7 @@
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v1.3/stats/by-summoner/{summonerId}/ranked" };
             request.AddParameter("summonerId", summonerId, ParameterType.UrlSegment);
-            if (!string.IsNullOrWhiteSpace(season)) request.AddParameter("season", season, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(season)) request.AddParameter("season", season, ParameterType.QueryString);
 
             return await Execute<RankedStatsDto>(request);
         }
@@ -125,7 +125,7 @@
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v1.3/stats/by-summoner/{summonerId}/summary" };
             request.AddParameter("summonerId", summonerId, ParameterType.UrlSegment);
-            if (!string.IsNullOrWhiteSpace(season)) request.AddParameter("season", season, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(season)) request.AddParameter("season", season, ParameterType.QueryString);
 
             return await Execute<PlayerStatsSummaryListDto>(request);
         }
@@ -189,10 +189,10 @@
         {
             var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/champion" };
 
-            if (!string.IsNullOrWhiteSpace(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
-            if (!string.IsNullOrWhiteSpace(version)) request.AddParameter("version", version, ParameterType.QueryString);
-            if (!string.IsNullOrWhiteSpace(dataById)) request.AddParameter("dataById", dataById, ParameterType.QueryString);
-            if (!string.IsNullOrWhiteSpace(champData)) request.AddParameter("champData", champData, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(dataById)) request.AddParameter("dataById", dataById, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(champData)) request.AddParameter("champData", champData, ParameterType.QueryString);
 
             return await Execute<ChampionListDto>(request);
         }
@@ -202,12 +202,140 @@
             var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/champion/{id}" };
             request.AddParameter("id", championId, ParameterType.UrlSegment);
 
-            if (!string.IsNullOrWhiteSpace(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
-            if (!string.IsNullOrWhiteSpace(version)) request.AddParameter("version", version, ParameterType.QueryString);
-            if (!string.IsNullOrWhiteSpace(dataById)) request.AddParameter("dataById", dataById, ParameterType.QueryString);
-            if (!string.IsNullOrWhiteSpace(champData)) request.AddParameter("champData", champData, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(dataById)) request.AddParameter("dataById", dataById, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(champData)) request.AddParameter("champData", champData, ParameterType.QueryString);
 
             return Execute<ChampionDto>(request);
+        }
+
+        public async Task<ItemListDto> GetItems(string locale = null, string version = null, string itemListData = null)
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/item" };
+
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(itemListData)) request.AddParameter("itemListData", itemListData, ParameterType.QueryString);
+
+            return await Execute<ItemListDto>(request);
+        }
+
+        public async Task<ItemDto> GetItem(int itemId, string locale = null, string version = null, string itemData = null)
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/item/{id}" };
+            request.AddParameter("id", itemId, ParameterType.UrlSegment);
+
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(itemData)) request.AddParameter("itemData", itemData, ParameterType.QueryString);
+
+            return await Execute<ItemDto>(request);
+        }
+
+        public async Task<LanguageStringsDto> GetLanguageStrings()
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/language-strings" };
+
+            return await Execute<LanguageStringsDto>(request);
+        }
+
+        public async Task<List<string>> GetLanguages()
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/languages" };
+
+            return await Execute<List<string>>(request);
+        }
+
+        public async Task<MapDataDto> GetMaps()
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/map" };
+
+            return await Execute<MapDataDto>(request);
+        }
+
+        public async Task<MasteryListDto> GetMasteries(string locale = null, string version = null, string masteryListData = null)
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/mastery" };
+
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(masteryListData)) request.AddParameter("itemData", masteryListData, ParameterType.QueryString);
+
+            return await Execute<MasteryListDto>(request);
+        }
+
+        public async Task<MasteryDto> GetMastery(int masterId, string locale = null, string version = null, string masteryData = null)
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/mastery/{id}" };
+            request.AddParameter("id", masterId, ParameterType.UrlSegment);
+
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(masteryData)) request.AddParameter("masteryData", masteryData, ParameterType.QueryString);
+
+            return await Execute<MasteryDto>(request);
+        }
+
+        public async Task<RealmDto> GetRealms()
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/realm" };
+
+            return await Execute<RealmDto>(request);
+        }
+
+        public async Task<RuneListDto> GetRunes(string locale = null, string version = null, string runeListData = null)
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/rune" };
+
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(runeListData)) request.AddParameter("runeListData", runeListData, ParameterType.QueryString);
+
+            return await Execute<RuneListDto>(request);
+        }
+
+        public async Task<RuneDto> GetRune(int runeId, string locale = null, string version = null, string runeData = null)
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/rune/{id}" };
+            request.AddParameter("id", runeId, ParameterType.UrlSegment);
+
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(runeData)) request.AddParameter("runeData", runeData, ParameterType.QueryString);
+
+            return await Execute<RuneDto>(request);
+        }
+
+        public async Task<SummonerSpellListDto> GetSummonerSpells(string locale = null, string version = null, string spellData = null)
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/summoner-spell" };
+
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(spellData)) request.AddParameter("runeData", spellData, ParameterType.QueryString);
+
+            return await Execute<SummonerSpellListDto>(request);
+        }
+
+        public async Task<SummonerSpellDto> GetSummonerSpell(int summonerSpellId, string locale = null, string version = null, string spellData = null)
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/summoner-spell/{id}" };
+            request.AddParameter("id", summonerSpellId, ParameterType.UrlSegment);
+
+            if (!string.IsNullOrEmpty(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrEmpty(spellData)) request.AddParameter("spellData", spellData, ParameterType.QueryString);
+
+            return await Execute<SummonerSpellDto>(request);
+        }
+
+        public async Task<List<string>> GetVersions()
+        {
+            var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/versions" };
+
+
+            return await Execute<List<string>>(request);
         }
 
         public async Task<RiotObjects.Champion.ChampionListDto> GetChampionsData(bool? freeToPlay = null)
@@ -310,7 +438,7 @@
             return await Execute<LeagueDto>(request);
         }
 
-        public async Task<LeagueDto> GetMastersLeague()
+        public async Task<LeagueDto> GetMasterLeague()
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v2.5/league/master" };
 
