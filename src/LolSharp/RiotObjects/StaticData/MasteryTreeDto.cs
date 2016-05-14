@@ -1,3 +1,7 @@
+﻿namespace LolSharp.RiotObjects.StaticData
+{
+    using System.Collections.Generic;
+
     public class MasteryTreeDto
     {
         public List<MasteryTreeListDto> Cunning { get; set; }
