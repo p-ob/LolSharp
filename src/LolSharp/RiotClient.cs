@@ -66,7 +66,6 @@
             request.AddParameter("summonerIds", string.Join(",", summonerIds.Select(sId => sId.ToString())), ParameterType.UrlSegment);
 
             return await Execute<Dictionary<string, SummonerDto>>(request);
-
         }
 
         public async Task<Dictionary<string, SummonerDto>> GetSummonersByName(IEnumerable<string> summonerNames)
@@ -85,34 +84,45 @@
             return new Dictionary<string, SummonerDto>(resp, StringComparer.OrdinalIgnoreCase);
         }
 
-        public async Task<MatchList> GetMatchList(long summonerId)
+        public async Task<MatchList> GetMatchList(long summonerId, IEnumerable<long> summonerIds = null, IEnumerable<string> rankedQueues = null, IEnumerable<string> seasons = null, long? beginTime = null, long? endTime = null, int? beginIndex = null, int? endIndex = null)
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v2.2/matchlist/by-summoner/{summonerId}" };
             request.AddParameter("summonerId", summonerId, ParameterType.UrlSegment);
 
+            if (summonerIds != null) request.AddParameter("summonerIds", string.Join(",", summonerIds.Select(s => s.ToString())), ParameterType.QueryString);
+            if (rankedQueues != null) request.AddParameter("rankedQueues", string.Join(",", rankedQueues), ParameterType.QueryString);
+            if (seasons != null) request.AddParameter("seasons", string.Join(",", seasons), ParameterType.QueryString);
+            if (beginTime != null) request.AddParameter("beginTime", beginTime, ParameterType.QueryString);
+            if (endTime != null) request.AddParameter("endTime", endTime, ParameterType.QueryString);
+            if (beginIndex != null) request.AddParameter("beginIndex", beginIndex, ParameterType.QueryString);
+            if (endIndex != null) request.AddParameter("endIndex", endIndex, ParameterType.QueryString);
+
             return await Execute<MatchList>(request);
         }
 
-        public async Task<MatchDetail> GetMatch(long matchId)
+        public async Task<MatchDetail> GetMatch(long matchId, bool includeTimeline = false)
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v2.2/match/{matchId}" };
             request.AddParameter("matchId", matchId, ParameterType.UrlSegment);
+            request.AddParameter("includeTimeline", includeTimeline, ParameterType.QueryString);
 
             return await Execute<MatchDetail>(request);
         }
 
-        public async Task<RankedStatsDto> GetRankedStats(long summonerId)
+        public async Task<RankedStatsDto> GetRankedStats(long summonerId, string season = null)
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v1.3/stats/by-summoner/{summonerId}/ranked" };
             request.AddParameter("summonerId", summonerId, ParameterType.UrlSegment);
+            if (!string.IsNullOrWhiteSpace(season)) request.AddParameter("season", season, ParameterType.QueryString);
 
             return await Execute<RankedStatsDto>(request);
         }
 
-        public async Task<PlayerStatsSummaryListDto> GetSummaryStats(long summonerId)
+        public async Task<PlayerStatsSummaryListDto> GetSummaryStats(long summonerId, string season = null)
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v1.3/stats/by-summoner/{summonerId}/summary" };
             request.AddParameter("summonerId", summonerId, ParameterType.UrlSegment);
+            if (!string.IsNullOrWhiteSpace(season)) request.AddParameter("season", season, ParameterType.QueryString);
 
             return await Execute<PlayerStatsSummaryListDto>(request);
         }
@@ -153,11 +163,12 @@
             return await Execute<int>(request);
         }
 
-        public async Task<List<ChampionMasteryDto>> GetChampionMasteryTopChampions(long summonerId)
+        public async Task<List<ChampionMasteryDto>> GetChampionMasteryTopChampions(long summonerId, int count = 3)
         {
             var request = new RestRequest { Resource = "championmastery/location/{platformId}/player/{playerId}/topchampions" };
             request.AddParameter("playerId", summonerId, ParameterType.UrlSegment);
             request.AddParameter("platformId", MapRegionToPlatform().ToString().ToUpper(), ParameterType.UrlSegment);
+            request.AddParameter("count", count, ParameterType.QueryString);
 
             return await Execute<List<ChampionMasteryDto>>(request);
         }
@@ -171,24 +182,35 @@
             return Execute<CurrentGameInfo>(request);
         }
 
-        public async Task<ChampionListDto> GetChampionsStaticData()
+        public async Task<ChampionListDto> GetChampionsStaticData(string locale = null, string version = null, string dataById = null, string champData = null)
         {
             var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/champion" };
+
+            if (!string.IsNullOrWhiteSpace(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrWhiteSpace(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrWhiteSpace(dataById)) request.AddParameter("dataById", dataById, ParameterType.QueryString);
+            if (!string.IsNullOrWhiteSpace(champData)) request.AddParameter("champData", champData, ParameterType.QueryString);
 
             return await Execute<ChampionListDto>(request);
         }
 
-        public Task<ChampionDto> GetChampionStaticData(int championId)
+        public Task<ChampionDto> GetChampionStaticData(int championId, string locale = null, string version = null, string dataById = null, string champData = null)
         {
             var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/champion/{id}" };
             request.AddParameter("id", championId, ParameterType.UrlSegment);
 
+            if (!string.IsNullOrWhiteSpace(locale)) request.AddParameter("locale", locale, ParameterType.QueryString);
+            if (!string.IsNullOrWhiteSpace(version)) request.AddParameter("version", version, ParameterType.QueryString);
+            if (!string.IsNullOrWhiteSpace(dataById)) request.AddParameter("dataById", dataById, ParameterType.QueryString);
+            if (!string.IsNullOrWhiteSpace(champData)) request.AddParameter("champData", champData, ParameterType.QueryString);
+
             return Execute<ChampionDto>(request);
         }
 
-        public async Task<RiotObjects.Champion.ChampionListDto> GetChampionsData()
+        public async Task<RiotObjects.Champion.ChampionListDto> GetChampionsData(bool freeToPlay = false)
         {
             var request = new RestRequest { Resource = "api/lol/{region}/v1.2/champion" };
+            request.AddParameter("freeToPlay", freeToPlay, ParameterType.QueryString);
 
             return await Execute<RiotObjects.Champion.ChampionListDto>(request);
         }
@@ -243,16 +265,13 @@
                     var retryAfterValue = retryAfterHeader?.Value as int?;
                     if (retryAfterValue != null)
                     {
-                        throw new TooManyRequestsException(retryAfterValue.Value,
-                            "Riot responded with an HTTP status code of 429. Check RetryAfter to see minimum wait time.",
-                            response.ErrorException);
+                        throw new TooManyRequestsException(retryAfterValue.Value, "Riot responded with an HTTP status code of 429. Check RetryAfter to see minimum wait time.", response.ErrorException);
                     }
 
                     throw new TooManyRequestsException();
                 }
                 var message = $"Error retrieving response. Riot returned an HTTP Status of {response.StatusCode}. Check inner details for more info.";
-                var riotException = new RiotApiException(response.StatusCode, message, response.ErrorException);
-                throw riotException;
+                throw new RiotApiException(response.StatusCode, message, response.ErrorException);
             }
             return response.Data;
         }
@@ -266,7 +285,7 @@
             }
             catch (RiotApiException e) when (e.StatusCode == HttpStatusCode.Unauthorized)
             {
-                throw new RiotClientException("Api key is not valid. Get a valid api key from https://developer.riotgames.com/");
+                throw new RiotClientException("Api key is not valid. Get a valid api key from https://developer.riotgames.com/", e);
             }
         }
 
