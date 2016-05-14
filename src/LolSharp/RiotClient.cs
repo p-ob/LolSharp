@@ -21,7 +21,17 @@
     {
         private readonly string _apiKey;
 
-        public RiotRegion Region { get; set; }
+        private RiotRegion _region;
+
+        public RiotRegion Region
+        {
+            get { return _region; }
+            set
+            {
+                if (!Enum.IsDefined(typeof(RiotRegion), value)) throw new RiotClientException("Region is not valid");
+                _region = value;
+            }
+        }
 
         public RiotClient(string apiKey) : this(apiKey, RiotRegion.Na)
         {
@@ -30,12 +40,11 @@
         public RiotClient(string apiKey, RiotRegion region)
         {
             if (string.IsNullOrWhiteSpace(apiKey)) throw new ArgumentException("apiKey is required", nameof(apiKey));
-            if (!Enum.IsDefined(typeof(RiotRegion), region)) throw new ArgumentException("Region is not valid.", nameof(region));
-
-            CheckApiKey();
 
             _apiKey = apiKey;
             Region = region;
+
+            CheckApiKey();
         }
 
         public async Task<SummonerDto> GetSummoner(long summonerId)
