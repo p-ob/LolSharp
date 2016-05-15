@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace LolSharp.RiotObjects.Status
+﻿namespace LolSharp.RiotObjects.Status
 {
+    using System.Collections.Generic;
+
     public class Shard
     {
         public string Hostname { get; set; }
