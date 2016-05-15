@@ -8,7 +8,7 @@
     {
         public HttpStatusCode StatusCode { get; set; }
 
-        public RiotApiException(HttpStatusCode statusCode) : this(statusCode, string.Empty, null)
+        public RiotApiException(HttpStatusCode statusCode) : this(statusCode, string.Empty)
         {
         }
 

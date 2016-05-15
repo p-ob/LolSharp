@@ -150,7 +150,7 @@
             var request = new RestRequest {Resource = "api/lol/{region}/v2.2/matchlist/by-summoner/{summonerId}"};
             request.AddParameter("summonerId", summonerId, ParameterType.UrlSegment);
 
-            if (championIds != null) request.AddParameter("summonerIds", string.Join(",", championIds.Select(s => s.ToString())), ParameterType.QueryString);
+            if (championIds != null) request.AddParameter("championIds", string.Join(",", championIds.Select(s => s.ToString())), ParameterType.QueryString);
             if (rankedQueues != null) request.AddParameter("rankedQueues", string.Join(",", rankedQueues), ParameterType.QueryString);
             if (seasons != null) request.AddParameter("seasons", string.Join(",", seasons), ParameterType.QueryString);
             if (beginTime != null) request.AddParameter("beginTime", beginTime, ParameterType.QueryString);

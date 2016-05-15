@@ -9,18 +9,16 @@
     {
         public int RetryAfter { get; set; }
 
-        public TooManyRequestsException() : this(-1, "No retry after value given.")
+        public TooManyRequestsException() : this(-1)
         {
         }
 
-        public TooManyRequestsException(int retryAfter) : base((HttpStatusCode)429, string.Empty)
+        public TooManyRequestsException(int retryAfter) : this(retryAfter, string.Empty)
         {
-            RetryAfter = retryAfter;
         }
 
-        public TooManyRequestsException(int retryAfter, string message) : base((HttpStatusCode)429, message)
+        public TooManyRequestsException(int retryAfter, string message) : this(retryAfter, message, null)
         {
-            RetryAfter = retryAfter;
         }
 
         public TooManyRequestsException(int retryAfter, string message, Exception innerException)
