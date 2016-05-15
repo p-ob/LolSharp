@@ -22,6 +22,7 @@
     public class RiotClient : IRiotClient
     {
         private readonly string _apiKey;
+        private readonly bool _debugMode;
 
         private RiotRegion _region;
 
@@ -35,15 +36,16 @@
             }
         }
 
-        public RiotClient(string apiKey) : this(apiKey, RiotRegion.Na)
+        public RiotClient(string apiKey, bool debugMode = false) : this(apiKey, RiotRegion.Na, debugMode)
         {
         }
 
-        public RiotClient(string apiKey, RiotRegion region)
+        public RiotClient(string apiKey, RiotRegion region, bool debugMode = false)
         {
             if (string.IsNullOrEmpty(apiKey)) throw new ArgumentException("apiKey is required", nameof(apiKey));
 
             _apiKey = apiKey;
+            _debugMode = debugMode;
             Region = region;
 
             CheckApiKey();
@@ -579,13 +581,13 @@
                     var retryAfterValue = retryAfterHeader?.Value as int?;
                     if (retryAfterValue != null)
                     {
-                        throw new TooManyRequestsException(retryAfterValue.Value, "Riot responded with an HTTP status code of 429. Check RetryAfter to see minimum wait time.", response.ErrorException);
+                        throw new TooManyRequestsException(retryAfterValue.Value, response.ErrorException, _debugMode ? response : null);
                     }
 
-                    throw new TooManyRequestsException();
+                    throw new TooManyRequestsException(response.ErrorException, response);
                 }
                 var message = $"Error retrieving response. Riot returned an HTTP Status of {response.StatusCode}. Check inner details for more info.";
-                throw new RiotApiException(response.StatusCode, message, response.ErrorException);
+                throw new RiotApiException(response.StatusCode, message, response.ErrorException, _debugMode ? response : null);
             }
             return response.Data;
         }

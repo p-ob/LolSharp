@@ -3,26 +3,19 @@
     using System;
 
     using System.Net;
+    using RestSharp;
 
     [Serializable]
     public class TooManyRequestsException : RiotApiException
     {
         public int RetryAfter { get; set; }
 
-        public TooManyRequestsException() : this(-1)
+        public TooManyRequestsException(Exception innerException, IRestResponse response) : base((HttpStatusCode)429, "No RetryAfter value available.", innerException, response)
         {
         }
 
-        public TooManyRequestsException(int retryAfter) : this(retryAfter, string.Empty)
-        {
-        }
-
-        public TooManyRequestsException(int retryAfter, string message) : this(retryAfter, message, null)
-        {
-        }
-
-        public TooManyRequestsException(int retryAfter, string message, Exception innerException)
-            : base((HttpStatusCode)429, message, innerException)
+        public TooManyRequestsException(int retryAfter, Exception innerException, IRestResponse response)
+            : base((HttpStatusCode)429, "Riot responded with an HTTP status code of 429. Check RetryAfter to see minimum wait time.", innerException, response)
         {
             RetryAfter = retryAfter;
         }
