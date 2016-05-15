@@ -11,7 +11,9 @@
     using RiotObjects.MatchList;
     using RiotObjects.StaticData;
     using RiotObjects.Stats;
+    using RiotObjects.Status;
     using RiotObjects.Summoner;
+    using MasteryDto = RiotObjects.StaticData.MasteryDto;
 
     public interface IRiotClient
     {
@@ -32,6 +34,22 @@
         Task<SummonerDto> GetSummonerByName(string summonerName, RiotRegion? region = null);
 
         /// <summary>
+        /// /api/lol/{region}/v1.4/summoner/{summonerIds}/masteries
+        /// </summary>
+        /// <param name="summonerId"></param>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        Task<MasteryPagesDto> GetMasteriesForSummoner(long summonerId, RiotRegion? region = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="summonerId"></param>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        Task<RunePagesDto> GetRunesForSummoner(long summonerId, RiotRegion? region = null);
+
+        /// <summary>
         /// /api/lol/{region}/v1.4/summoner/{summonerIds}
         /// </summary>
         /// <param name="summonerIds"></param>
@@ -48,10 +66,34 @@
         Task<Dictionary<string, SummonerDto>> GetSummonersByName(IEnumerable<string> summonerNames, RiotRegion? region = null);
 
         /// <summary>
+        /// /api/lol/{region}/v1.4/summoner/{summonerIds}/masteries
+        /// </summary>
+        /// <param name="summonerIds"></param>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, MasteryPagesDto>> GetMasteriesForSummoners(IEnumerable<long> summonerIds, RiotRegion? region = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="summonerIds"></param>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, RunePagesDto>> GetRunesForSummoners(IEnumerable<long> summonerIds, RiotRegion? region = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="summonerIds"></param>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, string>> GetSummonerNames(IEnumerable<long> summonerIds, RiotRegion? region = null);
+
+        /// <summary>
         /// /api/lol/{region}/v2.2/matchlist/by-summoner/{summonerId}
         /// </summary>
         /// <param name="summonerId"></param>
-        /// <param name="summonerIds"></param>
+        /// <param name="championIds"></param>
         /// <param name="rankedQueues"></param>
         /// <param name="seasons"></param>
         /// <param name="beginTime"></param>
@@ -60,7 +102,7 @@
         /// <param name="endIndex"></param>
         /// <param name="region"></param>
         /// <returns></returns>
-        Task<MatchList> GetMatchList(long summonerId, IEnumerable<long> summonerIds = null, IEnumerable<string> rankedQueues = null, IEnumerable<string> seasons = null, long? beginTime = null, long? endTime = null, int? beginIndex = null, int? endIndex = null, RiotRegion? region = null);
+        Task<MatchList> GetMatchList(long summonerId, IEnumerable<long> championIds = null, IEnumerable<string> rankedQueues = null, IEnumerable<string> seasons = null, long? beginTime = null, long? endTime = null, int? beginIndex = null, int? endIndex = null, RiotRegion? region = null);
 
         /// <summary>
         /// /api/lol/{region}/v2.2/match/{matchId}
@@ -380,5 +422,18 @@
         /// <param name="region"></param>
         /// <returns></returns>
         Task<FeaturedGames> GetFeaturedGames(RiotRegion? region = null);
+
+        /// <summary>
+        /// /shards
+        /// </summary>
+        /// <returns></returns>
+        Task<List<Shard>> GetShards();
+
+        /// <summary>
+        /// /shards/{shardRegion}
+        /// </summary>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        Task<ShardStatus> GetShard(string region);
     }
 }

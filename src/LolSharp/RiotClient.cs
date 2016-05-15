@@ -15,7 +15,9 @@
     using RiotObjects.MatchList;
     using RiotObjects.StaticData;
     using RiotObjects.Stats;
+    using RiotObjects.Status;
     using RiotObjects.Summoner;
+    using MasteryDto = RiotObjects.StaticData.MasteryDto;
 
     public class RiotClient : IRiotClient
     {
@@ -49,19 +51,33 @@
 
         public async Task<SummonerDto> GetSummoner(long summonerId, RiotRegion? region = null)
         {
-            if (region != null) Region = region.Value;
-            var summoner = await GetSummoners(new List<long> { summonerId });
+            var summoner = await GetSummoners(new List<long> { summonerId }, region);
             SummonerDto summonerDto;
             return summoner.TryGetValue(summonerId.ToString(), out summonerDto) ? summonerDto : null;
         }
 
         public async Task<SummonerDto> GetSummonerByName(string summonerName, RiotRegion? region = null)
         {
-            if (region != null) Region = region.Value;
-            var summoner = await GetSummonersByName(new List<string> { summonerName });
+            var summoner = await GetSummonersByName(new List<string> { summonerName }, region);
 
             SummonerDto summonerDto;
             return summoner.TryGetValue(summonerName, out summonerDto) ? summonerDto : null;
+        }
+
+        public async Task<MasteryPagesDto> GetMasteriesForSummoner(long summonerId, RiotRegion? region = null)
+        {
+            var masteries = await GetMasteriesForSummoners(new List<long> { summonerId }, region);
+
+            MasteryPagesDto masteriesDto;
+            return masteries.TryGetValue(summonerId.ToString(), out masteriesDto) ? masteriesDto : null;
+        }
+
+        public async Task<RunePagesDto> GetRunesForSummoner(long summonerId, RiotRegion? region = null)
+        {
+            var runes = await GetRunesForSummoners(new List<long> { summonerId }, region);
+
+            RunePagesDto runesDto;
+            return runes.TryGetValue(summonerId.ToString(), out runesDto) ? runesDto : null;
         }
 
         public async Task<Dictionary<string, SummonerDto>> GetSummoners(IEnumerable<long> summonerIds, RiotRegion? region = null)
@@ -91,19 +107,51 @@
             return new Dictionary<string, SummonerDto>(resp, StringComparer.OrdinalIgnoreCase);
         }
 
-        public async Task<MatchList> GetMatchList(long summonerId, IEnumerable<long> summonerIds = null,
-            IEnumerable<string> rankedQueues = null, IEnumerable<string> seasons = null, long? beginTime = null,
-            long? endTime = null, int? beginIndex = null, int? endIndex = null, RiotRegion? region = null)
+
+        public async Task<Dictionary<string, MasteryPagesDto>> GetMasteriesForSummoners(IEnumerable<long> summonerIds, RiotRegion? region = null)
+        {
+            if (region != null) Region = region.Value;
+            summonerIds = summonerIds.ToList();
+            if (summonerIds.Count() > 40) throw new ArgumentException("Can only pass in up to 40 summoners to retrieve", nameof(summonerIds));
+            var request = new RestRequest { Resource = "api/lol/{region}/v1.4/summoner/{summonerIds}/masteries" };
+
+            request.AddParameter("summonerIds", string.Join(",", summonerIds.Select(sId => sId.ToString())), ParameterType.UrlSegment);
+
+            return await Execute<Dictionary<string, MasteryPagesDto>>(request);
+        }
+
+        public async Task<Dictionary<string, RunePagesDto>> GetRunesForSummoners(IEnumerable<long> summonerIds, RiotRegion? region = null)
+        {
+            if (region != null) Region = region.Value;
+            summonerIds = summonerIds.ToList();
+            if (summonerIds.Count() > 40) throw new ArgumentException("Can only pass in up to 40 summoners to retrieve", nameof(summonerIds));
+            var request = new RestRequest { Resource = "api/lol/{region}/v1.4/summoner/{summonerIds}/runes" };
+
+            request.AddParameter("summonerIds", string.Join(",", summonerIds.Select(sId => sId.ToString())), ParameterType.UrlSegment);
+
+            return await Execute<Dictionary<string, RunePagesDto>>(request);
+        }
+
+        public async Task<Dictionary<string, string>> GetSummonerNames(IEnumerable<long> summonerIds, RiotRegion? region = null)
+        {
+            if (region != null) Region = region.Value;
+            summonerIds = summonerIds.ToList();
+            if (summonerIds.Count() > 40) throw new ArgumentException("Can only pass in up to 40 summoners to retrieve", nameof(summonerIds));
+            var request = new RestRequest { Resource = "api/lol/{region}/v1.4/summoner/{summonerIds}/names" };
+
+            request.AddParameter("summonerIds", string.Join(",", summonerIds.Select(sId => sId.ToString())), ParameterType.UrlSegment);
+
+            return await Execute<Dictionary<string, string>>(request);
+        }
+
+        public async Task<MatchList> GetMatchList(long summonerId, IEnumerable<long> championIds = null, IEnumerable<string> rankedQueues = null, IEnumerable<string> seasons = null, long? beginTime = null, long? endTime = null, int? beginIndex = null, int? endIndex = null, RiotRegion? region = null)
         {
             if (region != null) Region = region.Value;
             var request = new RestRequest {Resource = "api/lol/{region}/v2.2/matchlist/by-summoner/{summonerId}"};
             request.AddParameter("summonerId", summonerId, ParameterType.UrlSegment);
 
-            if (summonerIds != null)
-                request.AddParameter("summonerIds", string.Join(",", summonerIds.Select(s => s.ToString())),
-                    ParameterType.QueryString);
-            if (rankedQueues != null)
-                request.AddParameter("rankedQueues", string.Join(",", rankedQueues), ParameterType.QueryString);
+            if (championIds != null) request.AddParameter("summonerIds", string.Join(",", championIds.Select(s => s.ToString())), ParameterType.QueryString);
+            if (rankedQueues != null) request.AddParameter("rankedQueues", string.Join(",", rankedQueues), ParameterType.QueryString);
             if (seasons != null) request.AddParameter("seasons", string.Join(",", seasons), ParameterType.QueryString);
             if (beginTime != null) request.AddParameter("beginTime", beginTime, ParameterType.QueryString);
             if (endTime != null) request.AddParameter("endTime", endTime, ParameterType.QueryString);
@@ -493,9 +541,24 @@
         public async Task<FeaturedGames> GetFeaturedGames(RiotRegion? region = null)
         {
             if (region != null) Region = region.Value;
-            var request = new RestRequest { Resource = "/observer-mode/rest/featured" };
+            var request = new RestRequest { Resource = "observer-mode/rest/featured" };
 
             return await Execute<FeaturedGames>(request);
+        }
+
+        public async Task<List<Shard>> GetShards()
+        {
+            var request = new RestRequest {Resource = "/shards"};
+
+            return await Execute<List<Shard>>(request);
+        }
+
+        public async Task<ShardStatus> GetShard(string shardRegion)
+        {
+            var request = new RestRequest { Resource = "shards/{shardRegion}" };
+            request.AddParameter("shardRegion", shardRegion, ParameterType.UrlSegment);
+
+            return await Execute<ShardStatus>(request);
         }
 
         private async Task<T> Execute<T>(IRestRequest request) where T : new()
