@@ -2,10 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using Moq;
-    using Xunit;
     using RestSharp;
+    using RiotObjects.StaticData;
+    using Xunit;
     using RiotObjects.Summoner;
 
     public class RiotClientSummonerTests
@@ -17,24 +19,48 @@
             Name = "Drunk7Irishman",
             SummonerLevel = 30
         };
-        private readonly Mock<IRiotClient> _riotClient;
+
+        private readonly IRiotClient _riotClient;
 
         public RiotClientSummonerTests()
         {
-            //_restClient.Setup(c => c.ExecuteAsync(
-            //    It.IsAny<IRestRequest>(),
-            //    It.IsAny<Action<IRestResponse<Dictionary<string, SummonerDto>>, RestRequestAsyncHandle>>()))
-            //    .Callback<IRestRequest, Action<IRestResponse<Dictionary<string, SummonerDto>>, RestRequestAsyncHandle>>(
-            //        (request, callback) =>
-            //        {
-            //            var responseMock = new Mock<IRestResponse<Dictionary<string, SummonerDto>>>();
-            //            responseMock.Setup(r => r.Data).Returns(new Dictionary<string, SummonerDto> { { "drunk7irishman", _mockSummoner }});
-            //            callback(responseMock.Object, null);
-            //        });
-            _riotClient = new Mock<IRiotClient>();
+            var restClientMock = new Mock<IRestClient>();
+            // For CheckApiCall called in RiotClient constructor
+            restClientMock.Setup(c => c.ExecuteTaskAsync<ChampionDto>(It.IsAny<IRestRequest>()))
+                .ReturnsAsync(new RestResponse<ChampionDto>
+                {
+                    Data = new ChampionDto(),
+                    StatusCode = HttpStatusCode.OK
+                });
 
-            _riotClient.Setup(c => c.GetSummoners(It.IsAny<IEnumerable<long>>(), null))
-                .ReturnsAsync(new Dictionary<string, SummonerDto> {{"drunk7irishman", _mockSummoner}});
+            restClientMock.Setup(
+                c =>
+                    c.ExecuteTaskAsync<Dictionary<string, SummonerDto>>(
+                        It.IsAny<IRestRequest>()))
+                .ReturnsAsync(new RestResponse<Dictionary<string, SummonerDto>>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Data = null
+                });
+
+            restClientMock.Setup(
+                c =>
+                    c.ExecuteTaskAsync<Dictionary<string, SummonerDto>>(
+                        It.Is<IRestRequest>(
+                            r =>
+                                r.Parameters.Any(
+                                    p =>
+                                        p.Name == "summonerIds" && ((string)p.Value).Contains(SummonerId.ToString())))))
+                .ReturnsAsync(new RestResponse<Dictionary<string, SummonerDto>>
+                {
+                    Data = new Dictionary<string, SummonerDto> { { SummonerId.ToString(), _mockSummoner } },
+                    StatusCode = HttpStatusCode.OK
+                });
+
+            
+
+
+            _riotClient = new RiotClient(restClientMock.Object, "fake-api-key", true);
         }
 
         [Fact]
@@ -42,9 +68,12 @@
         {
             try
             {
+                var gottenSummoner = _riotClient.GetSummoner(SummonerId).Result;
+                Assert.True(gottenSummoner.Id == SummonerId);
             }
             catch (RiotApiException e) when (e.StatusCode == HttpStatusCode.NotFound)
             {
+                Assert.False(true);
             }
         }
 
@@ -53,9 +82,12 @@
         {
             try
             {
+                var gottenSummoner = _riotClient.GetSummoner(SummonerId - 1).Result;
+                Assert.False(true);
             }
             catch (RiotApiException e) when (e.StatusCode == HttpStatusCode.NotFound)
             {
+                Assert.True(true);
             }
         }
     }

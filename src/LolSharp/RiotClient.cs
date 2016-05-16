@@ -23,6 +23,7 @@
     {
         private readonly string _apiKey;
         private readonly bool _debugMode;
+        private IRestClient _restClient;
 
         private RiotRegion _region;
 
@@ -33,6 +34,7 @@
             {
                 if (!Enum.IsDefined(typeof(RiotRegion), value)) throw new RiotClientException("Region is not valid");
                 _region = value;
+                ConstructRestClient();
             }
         }
 
@@ -40,9 +42,10 @@
         /// Constructor for RiotClient class. RiotClient.Region will default to RiotRegion.Na. 
         /// Will make one api request on instantiation to check the validity of the api key given. This api request has no affect on your rate limit.
         /// </summary>
+        /// <param name="restClient"></param>
         /// <param name="apiKey">apik key acquired from: https://developer.riotgames.com</param>
         /// <param name="debugMode">when set to true, all RiotApiExceptions will bring the IRestResponse of the api call (note that the api key will be visible in that object)</param>
-        public RiotClient(string apiKey, bool debugMode = false) : this(apiKey, RiotRegion.Na, debugMode)
+        public RiotClient(IRestClient restClient, string apiKey, bool debugMode = false) : this(restClient, apiKey, RiotRegion.Na, debugMode)
         {
         }
 
@@ -50,18 +53,20 @@
         /// Constructor for RiotClient class with full configuration. Will make one api request on instantiation to check the validity of the api key given.
         /// This api request has no affect on your rate limit.
         /// </summary>
+        /// <param name="restClient"></param>
         /// <param name="apiKey">apik key acquired from: https://developer.riotgames.com</param>
         /// <param name="region">Region to make api requests against</param>
         /// <param name="debugMode">when set to true, all RiotApiExceptions will bring the IRestResponse of the api call (note that the api key will be visible in that object)</param>
-        public RiotClient(string apiKey, RiotRegion region, bool debugMode = false)
+        public RiotClient(IRestClient restClient, string apiKey, RiotRegion region, bool debugMode = false)
         {
             if (string.IsNullOrEmpty(apiKey)) throw new ArgumentException("apiKey is required", nameof(apiKey));
 
             _apiKey = apiKey;
             _debugMode = debugMode;
+            _restClient = restClient;
             Region = region;
 
-            CheckApiKey();
+            CheckApiKey().Wait();
         }
 
         public async Task<SummonerDto> GetSummoner(long summonerId, RiotRegion? region = null)
@@ -257,14 +262,14 @@
             return await Execute<List<ChampionMasteryDto>>(request);
         }
 
-        public Task<CurrentGameInfo> GetCurrentGame(long summonerId, RiotRegion? region = null)
+        public async Task<CurrentGameInfo> GetCurrentGame(long summonerId, RiotRegion? region = null)
         {
             if (region != null) Region = region.Value;
             var request = new RestRequest { Resource = "observer-mode/rest/consumer/getSpectatorGameInfo/{platformId}/{summonerId}" };
             request.AddParameter("summonerId", summonerId, ParameterType.UrlSegment);
             request.AddParameter("platformId", MapRegionToPlatform().ToString().ToUpper(), ParameterType.UrlSegment);
 
-            return Execute<CurrentGameInfo>(request);
+            return await Execute<CurrentGameInfo>(request);
         }
 
         public async Task<ChampionListDto> GetChampionsStaticData(string locale = null, string version = null, string dataById = null, string champData = null, RiotRegion? region = null)
@@ -280,7 +285,7 @@
             return await Execute<ChampionListDto>(request);
         }
 
-        public Task<ChampionDto> GetChampionStaticData(int championId, string locale = null, string version = null, string dataById = null, string champData = null, RiotRegion? region = null)
+        public async Task<ChampionDto> GetChampionStaticData(int championId, string locale = null, string version = null, string dataById = null, string champData = null, RiotRegion? region = null)
         {
             if (region != null) Region = region.Value;
             var request = new RestRequest { Resource = "api/lol/static-data/{region}/v1.2/champion/{id}" };
@@ -291,7 +296,7 @@
             if (!string.IsNullOrEmpty(dataById)) request.AddParameter("dataById", dataById, ParameterType.QueryString);
             if (!string.IsNullOrEmpty(champData)) request.AddParameter("champData", champData, ParameterType.QueryString);
 
-            return Execute<ChampionDto>(request);
+            return await Execute<ChampionDto>(request);
         }
 
         public async Task<ItemListDto> GetItems(string locale = null, string version = null, string itemListData = null, RiotRegion? region = null)
@@ -579,11 +584,9 @@
         private async Task<T> Execute<T>(IRestRequest request) where T : new()
         {
             var regionString = Region.ToString().ToLower();
-            var uri = new Uri($"https://{regionString}.api.pvp.net");
-            var client = new RestClient(uri);
             request.AddParameter("api_key", _apiKey, ParameterType.QueryString);
             request.AddParameter("region", regionString, ParameterType.UrlSegment);
-            var response = await client.ExecuteTaskAsync<T>(request);
+            var response = await _restClient.ExecuteTaskAsync<T>(request);
 
             if (response.ErrorException != null || response.StatusCode != HttpStatusCode.OK)
             {
@@ -605,12 +608,18 @@
             return response.Data;
         }
 
+        private void ConstructRestClient()
+        {
+            var regionString = Region.ToString().ToLower();
+            _restClient.BaseUrl = new Uri($"https://{regionString}.api.pvp.net");
+        }
+
         // runs an api call that doesn't count against the rate limit and checks for an HTTP Status of 401
-        private void CheckApiKey()
+        private async Task CheckApiKey()
         {
             try
             {
-                GetChampionStaticData(1);
+                await GetChampionStaticData(1);
             }
             catch (RiotApiException e) when (e.StatusCode == HttpStatusCode.Unauthorized)
             {
