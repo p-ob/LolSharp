@@ -64,31 +64,17 @@
         }
 
         [Fact]
-        public void TestGetExistingSummoner()
+        public async void TestGetExistingSummoner()
         {
-            try
-            {
-                var gottenSummoner = _riotClient.GetSummoner(SummonerId).Result;
-                Assert.True(gottenSummoner.Id == SummonerId);
-            }
-            catch (RiotApiException e) when (e.StatusCode == HttpStatusCode.NotFound)
-            {
-                Assert.False(true);
-            }
+            var gottenSummoner = await _riotClient.GetSummoner(SummonerId);
+            Assert.True(gottenSummoner.Id == SummonerId);
         }
 
         [Fact]
-        public void TestGetNonexistentSummoner()
+        public async void TestGetNonexistentSummoner()
         {
-            try
-            {
-                var gottenSummoner = _riotClient.GetSummoner(SummonerId - 1).Result;
-                Assert.False(true);
-            }
-            catch (RiotApiException e) when (e.StatusCode == HttpStatusCode.NotFound)
-            {
-                Assert.True(true);
-            }
+            var exception = await Assert.ThrowsAsync<RiotApiException>(() => _riotClient.GetSummoner(SummonerId - 1));
+            Assert.True(exception.StatusCode == HttpStatusCode.NotFound);
         }
     }
 }
