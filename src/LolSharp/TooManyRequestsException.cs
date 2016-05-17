@@ -1,7 +1,6 @@
 ﻿namespace LolSharp
 {
     using System;
-
     using System.Net;
     using RestSharp;
 

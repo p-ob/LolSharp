@@ -2,20 +2,33 @@
   "version": "1.0.0-*",
   "description": "LolSharp Class Library",
   "authors": [ "p-ob" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+  "buildOptions": {
+    "emitEntryPoint": false
+  },
+  
+  "packOptions": {
+    "licenseUrl": "",
+    "projectUrl": "https://github.com/p-ob/LolSharp",
+    "tags": [ ]
+  },
+
+  "dependencies": {
+  },
 
   "frameworks": {
-    "dnx451": {
+    "netcoreapp1.0": {
+      "imports": [ "dnxcore50", "portable-net45+win8" ],
       "dependencies": {
-        "RestSharp": "105.2.3",
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516"
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0-*"
+        }
       }
-    } 
+    },
+    "net46": {
+      "dependencies": {
+        "RestSharp": "105.2.3"
+      }
+    }
   }
 }

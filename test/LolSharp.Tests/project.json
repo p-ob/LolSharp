@@ -2,25 +2,33 @@
   "version": "1.0.0-*",
   "description": "LolSharp.Tests Class Library",
   "authors": [ "Pat" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-  "commands": {
-    "test":  "xunit.runner.dnx" 
-  }, 
+  "buildOptions": {
+    "emitEntryPoint": false
+  },
 
   "dependencies": {
-    "RestSharp": "105.2.3",
     "LolSharp": "1.0.0-*",
-    "Moq": "4.2.1510.2205",
-    "xunit": "2.1.0-*",
-    "xunit.runner.dnx": "2.1.0-*"
+    "xunit": "2.1.0-rc2-*",
+    "dotnet-test-xunit": "1.0.0-rc2-*"
   },
 
   "frameworks": {
-    "dnx451": {
+    "netcoreapp1.0": {
+      "imports": [ "dnxcore50", "portable-net45+win8" ],
       "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0-*"
+        }
+      }
+    },
+    "net46": {
+      "dependencies": {
+        "RestSharp": "105.2.3",
+        "Moq": "4.2.1510.2205"
       }
     }
-  }
+  },
+  
+  "testRunner": "xunit"
 }
