@@ -23,7 +23,7 @@
     {
         private readonly string _apiKey;
         private readonly bool _debugMode;
-        private IRestClient _restClient;
+        private readonly IRestClient _restClient;
 
         private RiotRegion _region;
 
@@ -42,10 +42,10 @@
         /// Constructor for RiotClient class. RiotClient.Region will default to RiotRegion.Na. 
         /// Will make one api request on instantiation to check the validity of the api key given. This api request has no affect on your rate limit.
         /// </summary>
-        /// <param name="restClient"></param>
         /// <param name="apiKey">apik key acquired from: https://developer.riotgames.com</param>
+        /// <param name="region">Region to make api requests against. Defaults to NA.</param>
         /// <param name="debugMode">when set to true, all RiotApiExceptions will bring the IRestResponse of the api call (note that the api key will be visible in that object)</param>
-        public RiotClient(IRestClient restClient, string apiKey, bool debugMode = false) : this(restClient, apiKey, RiotRegion.Na, debugMode)
+        public RiotClient(string apiKey, RiotRegion region = RiotRegion.Na, bool debugMode = false) : this(null, apiKey, region, debugMode)
         {
         }
 
@@ -53,17 +53,17 @@
         /// Constructor for RiotClient class with full configuration. Will make one api request on instantiation to check the validity of the api key given.
         /// This api request has no affect on your rate limit.
         /// </summary>
-        /// <param name="restClient"></param>
+        /// <param name="restClient">If given, uses this instance of RestClient to make all api requests. Otherwise, will create its own RestClient.</param>
         /// <param name="apiKey">apik key acquired from: https://developer.riotgames.com</param>
-        /// <param name="region">Region to make api requests against</param>
+        /// <param name="region">Region to make api requests against. Defaults to NA.</param>
         /// <param name="debugMode">when set to true, all RiotApiExceptions will bring the IRestResponse of the api call (note that the api key will be visible in that object)</param>
-        public RiotClient(IRestClient restClient, string apiKey, RiotRegion region, bool debugMode = false)
+        public RiotClient(IRestClient restClient, string apiKey, RiotRegion region = RiotRegion.Na, bool debugMode = false)
         {
             if (string.IsNullOrEmpty(apiKey)) throw new ArgumentException("apiKey is required", nameof(apiKey));
 
             _apiKey = apiKey;
             _debugMode = debugMode;
-            _restClient = restClient;
+            _restClient = restClient ?? new RestClient();
             Region = region;
 
             CheckApiKey().Wait();

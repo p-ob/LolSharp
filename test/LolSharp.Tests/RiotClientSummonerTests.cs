@@ -113,7 +113,7 @@
                     StatusCode = HttpStatusCode.OK
                 });
 
-            _riotClient = new RiotClient(restClientMock.Object, "fake-api-key", true);
+            _riotClient = new RiotClient(restClientMock.Object, "fake-api-key", RiotRegion.Na, true);
         }
 
         [Fact]
