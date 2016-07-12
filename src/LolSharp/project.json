@@ -5,30 +5,21 @@
   "buildOptions": {
     "emitEntryPoint": false
   },
-  
+
   "packOptions": {
     "licenseUrl": "",
     "projectUrl": "https://github.com/p-ob/LolSharp",
-    "tags": [ ]
+    "tags": []
   },
 
   "dependencies": {
+    "LolSharp.RestCore": "1.0.0-*",
+    "NETStandard.Library": "1.6.0"
   },
 
   "frameworks": {
-    "netcoreapp1.0": {
-      "imports": [ "dnxcore50", "portable-net45+win8" ],
-      "dependencies": {
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.0-*"
-        }
-      }
-    },
-    "net46": {
-      "dependencies": {
-        "RestSharp": "105.2.3"
-      }
+    "netstandard1.6": {
+      "imports": "dnxcore50"
     }
   }
 }

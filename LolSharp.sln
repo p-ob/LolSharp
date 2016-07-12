@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "LolSharp", "src\LolSharp\LolSharp.xproj", "{0CD1BAFC-88BA-4E16-8475-AB19A61D82F4}"
 EndProject
@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "LolSharp.Tests", "test\LolSharp.Tests\LolSharp.Tests.xproj", "{FD7B196F-B1C4-40CF-9B4F-9E9A4F80FFC1}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "LolSharp.RestCore", "src\LolSharp.RestCore\LolSharp.RestCore.xproj", "{F68B21D9-24E1-4A36-807D-CF63245963E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +30,10 @@ Global
 		{FD7B196F-B1C4-40CF-9B4F-9E9A4F80FFC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD7B196F-B1C4-40CF-9B4F-9E9A4F80FFC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD7B196F-B1C4-40CF-9B4F-9E9A4F80FFC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F68B21D9-24E1-4A36-807D-CF63245963E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F68B21D9-24E1-4A36-807D-CF63245963E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F68B21D9-24E1-4A36-807D-CF63245963E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F68B21D9-24E1-4A36-807D-CF63245963E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

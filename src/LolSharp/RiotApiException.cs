@@ -2,16 +2,15 @@
 {
     using System;
     using System.Net;
-    using RestSharp;
+    using RestCore;
 
-    [Serializable]
     public class RiotApiException : Exception
     {
         public HttpStatusCode StatusCode { get; set; }
 
-        public IRestResponse Response { get; set; }
+        public RestResponse Response { get; set; }
 
-        public RiotApiException(HttpStatusCode statusCode, string message, Exception innerException, IRestResponse response)
+        public RiotApiException(HttpStatusCode statusCode, string message, Exception innerException, RestResponse response)
             : base(message, innerException)
         {
             StatusCode = statusCode;

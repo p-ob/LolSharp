@@ -8,27 +8,17 @@
 
   "dependencies": {
     "LolSharp": "1.0.0-*",
-    "xunit": "2.1.0-rc2-*",
-    "dotnet-test-xunit": "1.0.0-rc2-*"
+    //"xunit": "2.1.0-rc2-*",
+    //"dotnet-test-xunit": "1.0.0-rc2-*"
   },
 
   "frameworks": {
-    "netcoreapp1.0": {
-      "imports": [ "dnxcore50", "portable-net45+win8" ],
+    "netstandard1.6": {
+      "imports": "dnxcore50",
       "dependencies": {
-        "Microsoft.NETCore.App": {
-          "type": "platform",
-          "version": "1.0.0-*"
-        }
-      }
-    },
-    "net46": {
-      "dependencies": {
-        "RestSharp": "105.2.3",
-        "Moq": "4.2.1510.2205"
       }
     }
   },
-  
+
   "testRunner": "xunit"
 }

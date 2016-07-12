@@ -2,7 +2,6 @@
 {
     using System;
 
-    [Serializable]
     public class RiotClientException : Exception
     {
         public RiotClientException(string message) : this(message, null)
