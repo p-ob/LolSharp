@@ -11,29 +11,27 @@
 
     public class RestCore : IRestCore, IDisposable
     {
-        private readonly HttpClient _client;
+        private HttpClient _client;
         private readonly Parameter _authorizationHeader;
 
-        private string _baseUrl;
+        private Uri _baseUrl;
 
-        public string BaseUrl
+        public Uri BaseUrl
         {
             get { return _baseUrl; }
             set
             {
+                if (BaseUrl == value) return;
+                Dispose();
                 _baseUrl = value;
-                _client.BaseAddress = new Uri(_baseUrl);
+                _client = new HttpClient { BaseAddress = value };
+                _client.DefaultRequestHeaders.Accept.Clear();
+                _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
         }
 
-        public RestCore(Parameter authHeader = null)
+        public RestCore(Parameter authHeader = null) : this((Uri) null, authHeader)
         {
-            _authorizationHeader = authHeader;
-            _client = new HttpClient();
-
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
         }
 
         public RestCore(string baseUrl, Parameter authHeader = null) : this(new Uri(baseUrl), authHeader)
@@ -44,7 +42,7 @@
         {
             _authorizationHeader = authHeader;
             _client = new HttpClient();
-            _baseUrl = baseUri.OriginalString;
+            _baseUrl = baseUri;
 
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

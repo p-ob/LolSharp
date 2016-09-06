@@ -20,5 +20,5 @@
     }
   },
 
-  "testRunner": "xunit"
+  //"testRunner": "xunit"
 }

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-*",
+  "version": "3.0.1-*",
   "description": "LolSharp Class Library",
   "authors": [ "p-ob" ],
   "buildOptions": {
@@ -13,7 +13,7 @@
   },
 
   "dependencies": {
-    "LolSharp.RestCore": "1.0.0-*",
+    "LolSharp.RestCore": "1.0.1",
     "NETStandard.Library": "1.6.0"
   },
 

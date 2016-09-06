@@ -22,6 +22,8 @@
             RequestUri = requestUri;
             MethodType = method ?? HttpMethod.Get;
             Data = data;
+            Parameters = new List<Parameter>();
+            Headers = new List<Parameter>();
         }
 
         public void AddParameter(string name, object value, ParameterType type)

@@ -611,7 +611,7 @@
         private void ConstructRestClient()
         {
             var regionString = Region.ToString().ToLower();
-            _restClient.BaseUrl = $"https://{regionString}.api.pvp.net";
+            _restClient.BaseUrl = new Uri($"https://{regionString}.api.pvp.net");
         }
 
         // runs an api call that doesn't count against the rate limit and checks for an HTTP Status of 401

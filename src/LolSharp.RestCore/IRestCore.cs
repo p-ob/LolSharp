@@ -1,10 +1,11 @@
 ﻿namespace LolSharp.RestCore
 {
+    using System;
     using System.Threading.Tasks;
 
     public interface IRestCore
     {
-        string BaseUrl { get; set; }
+        Uri BaseUrl { get; set; }
 
         Task<RestResponse>  Execute(RestRequest request);
 
